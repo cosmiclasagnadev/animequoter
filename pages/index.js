@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import { useState } from "react";
 const axios = require('axios').default;
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const getRandomQuote = async () => {
   const data = await axios.get('https://animechan.vercel.app/api/random');
@@ -8,17 +9,18 @@ const getRandomQuote = async () => {
   return data.data
 }
 
-var animeImageOptions  = {
+let animeImageOptions = {
   method: 'GET',
   url: 'https://bing-image-search1.p.rapidapi.com/images/search',
-  params: {q: 'anime', count: '1'},
+  params: { q: 'anime', count: '1' },
   headers: {
     'x-rapidapi-key': '67b335ab79mshc760d0fdd372facp1301e2jsn8d7acb97a43b',
     'x-rapidapi-host': 'bing-image-search1.p.rapidapi.com'
   }
 };
 
-const getAnimeImage= async () => {
+const getAnimeImage = async (query) => {
+  animeImageOptions.params.q = query;
   const imageData = await axios.request(animeImageOptions)
   console.log(imageData.data.value[0].contentUrl)
   const imageDataUrl = imageData.data.value[0].contentUrl
@@ -30,7 +32,9 @@ const getAnimeImage= async () => {
 
 export default function Home() {
   const [animeQuote, setAnimeQuote] = useState('')
-  const [imageUrl, setImageUrl] = useState('https://i.stack.imgur.com/y9DpT.jpg')
+
+  const placeholderImage = 'https://i.stack.imgur.com/y9DpT.jpg'
+  const [imageUrl, setImageUrl] = useState(placeholderImage);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-indigo-800">
@@ -44,25 +48,26 @@ export default function Home() {
           Anime Quoter
         </h1>
         <button onClick={async () => {
+          setImageUrl('')
           const animeData = await getRandomQuote();
-          // console.log(animeData)
+          console.log(animeData)
 
-          const { quote } = animeData;
+          const { quote, character } = animeData;
           // console.log(quote)
           setAnimeQuote(quote)
-          const dataUrl = await getAnimeImage();
+          const dataUrl = await getAnimeImage(character);
           setImageUrl(dataUrl)
-        }} class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        }} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
           Generate a Random Quote! 🍣
         </button>
 
-        <div class="py-4">
-          <img class="rounded-sm object-contain h-48 w-full" src={imageUrl}/>
-        </div>
-        <div>
-          <p>{animeQuote}</p>
-        </div>
-        
+        {(imageUrl === placeholderImage) || (imageUrl === '') ? <CircularProgress className='my-6' /> :
+          <div className="my-6 py-4 flex bg-gray-900 px-4 rounded-md">
+            <img className="rounded-sm object-cover h-48 w-48 py-4 px-4 rounded-full" src={imageUrl} />
+            <p className="font-semibold text-xl text-white my-auto text-left py-4 px-4">{animeQuote}</p>
+          </div>}
+
+
       </main>
     </div>
   )
