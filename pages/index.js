@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import { useState } from "react";
 const axios = require('axios').default;
+
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 const getRandomQuote = async () => {
@@ -8,6 +9,8 @@ const getRandomQuote = async () => {
   // console.log(data.data);
   return data.data
 }
+
+const api_key = process.env.REACT_APP_ANIME_API_KEY;
 
 let animeImageOptions = {
   method: 'GET',
@@ -60,13 +63,11 @@ export default function Home() {
         }} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
           Generate a Random Quote! 🍣
         </button>
-
-        {(imageUrl === placeholderImage) || (imageUrl === '') ? <CircularProgress className='my-6' /> :
-          <div className="my-6 py-4 flex bg-gray-900 px-4 rounded-md">
+        {(imageUrl === placeholderImage) || (animeQuote === '') ? <CircularProgress className='my-6' /> :
+          <div className="max-w-3xl my-6 py-4 flex bg-gray-900 px-4 rounded-md">
             <img className="rounded-sm object-cover h-48 w-48 py-4 px-4 rounded-full" src={imageUrl} />
             <p className="font-semibold text-xl text-white my-auto text-left py-4 px-4">{animeQuote}</p>
           </div>}
-
 
       </main>
     </div>
